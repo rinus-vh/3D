@@ -12,6 +12,7 @@ const DEFAULT_MODEL_SETTINGS: ModelSettings = {
   shadows: false,
   lightColor: '#ffffff',
   lightStrength: 2,
+  gravity: false,
 };
 
 interface ModelSettingsContextType {

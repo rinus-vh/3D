@@ -20,6 +20,7 @@ export interface ModelSettings {
   shadows: boolean;
   lightColor: string;
   lightStrength: number;
+  gravity: boolean;
 }
 
 export interface ExportSettings {

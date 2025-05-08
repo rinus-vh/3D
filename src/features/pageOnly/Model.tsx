@@ -29,6 +29,8 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
   const planeRef = useRef<THREE.Mesh>(null);
   const frameCountRef = useRef(0);
   const totalFrames = 60;
+  const velocityRef = useRef(0);
+  const [modelHeight, setModelHeight] = useState(0);
 
   useImperativeHandle(ref, () => groupRef.current!, []);
 
@@ -46,6 +48,9 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
           const maxDim = Math.max(size.x, size.y, size.z);
           const scale = 2 / maxDim;
           loadedModel.scale.setScalar(scale);
+
+          // Calculate scaled height for gravity
+          setModelHeight((size.y * scale) / 2);
 
           loadedModel.position.sub(center.multiplyScalar(scale));
           
@@ -185,9 +190,48 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
         } else {
           groupRef.current.rotation.z = rotation.z.fixed;
         }
+
+        // Apply gravity
+        if (modelSettings.gravity && !isRecording) {
+          const gravity = 9.81; // m/s²
+          const groundLevel = -1.5 + modelHeight; // Adjust ground level based on model height
+          const currentY = groupRef.current.position.y;
+
+          if (currentY > groundLevel) {
+            velocityRef.current -= gravity * delta;
+            groupRef.current.position.y += velocityRef.current * delta;
+
+            // Check if we hit the ground
+            if (groupRef.current.position.y <= groundLevel) {
+              groupRef.current.position.y = groundLevel;
+              velocityRef.current = 0;
+            }
+          }
+        } else {
+          // Reset position and velocity when gravity is disabled
+          groupRef.current.position.y = 0;
+          velocityRef.current = 0;
+        }
       }
     }
   });
+
+  // Create checkerboard texture
+  const textureSize = 10;
+  const data = new Uint8Array(textureSize * textureSize * 4);
+  for (let i = 0; i < textureSize; i++) {
+    for (let j = 0; j < textureSize; j++) {
+      const index = (i * textureSize + j) * 4;
+      const isEven = (i + j) % 2 === 0;
+      const color = isEven ? 100 : 95; // Two shades of grey
+      data[index] = color;     // R
+      data[index + 1] = color; // G
+      data[index + 2] = color; // B
+      data[index + 3] = 255;   // A
+    }
+  }
+  const texture = new THREE.DataTexture(data, textureSize, textureSize, THREE.RGBAFormat);
+  texture.needsUpdate = true;
 
   return (
     <>
@@ -195,7 +239,7 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
         {model && <primitive object={model} />}
       </group>
       
-      {(modelSettings.shadows || (!isRecording && showPlane)) && !modelSettings.wireframe && showShadowPlane && (
+      {(modelSettings.shadows || (!isRecording && showPlane)) && showShadowPlane && (
         <mesh
           ref={planeRef}
           rotation={[-Math.PI / 2, 0, 0]}
@@ -203,13 +247,20 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
           receiveShadow
           layers={1}
         >
-          <planeGeometry args={[10, 10]} />
-          <meshStandardMaterial
-            color="#ffffff"
-            transparent={true}
-            opacity={showPlane ? 1 : 0}
-            visible={showPlane}
-          />
+          <gridHelper args={[10, 10]} rotation={[Math.PI / 2, 0, 0]} visible={modelSettings.wireframe && showPlane} />
+          <planeGeometry args={[10, 10, 10, 10]} />
+          {modelSettings.wireframe ? (
+            <wireframeGeometry>
+              <lineBasicMaterial color="#404040" visible={showPlane} />
+            </wireframeGeometry>
+          ) : (
+            <meshStandardMaterial
+              map={texture}
+              transparent={true}
+              opacity={showPlane ? 1 : 0}
+              visible={showPlane}
+            />
+          )}
         </mesh>
       )}
     </>

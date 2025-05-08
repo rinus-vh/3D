@@ -56,15 +56,9 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
         <div className="w-full h-full bg-black/20 rounded-xl border border-white/20 overflow-hidden relative">
           {dockPreview && !dockPosition && (
             <div
-              className={`absolute inset-y-0 ${dockPreview === 'left' ? 'left-0' : 'right-0'} bg-white/5 border-2 border-white/20 pointer-events-none z-40`}
+              className={`absolute inset-y-0 ${dockPreview === 'left' ? 'left-0' : 'right-0'} bg-white/5 border-2 border-white/20 pointer-events-none z-40 bg-black/20`}
               style={{ width: `${PANEL_WIDTH}px` }}
-            >
-              <div className="h-full grid grid-cols-4 gap-px bg-white/10">
-                {Array.from({ length: 16 }).map((_, i) => (
-                  <div key={i} className="bg-black/20" />
-                ))}
-              </div>
-            </div>
+            />
           )}
 
           <div

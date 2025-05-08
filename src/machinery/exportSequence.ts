@@ -49,7 +49,9 @@ export async function captureFrameSequence({
       break;
   }
   renderer.setSize(width, height);
-  renderer.shadowMap.enabled = exportSettings.shadows;
+  
+  // Always enable shadow mapping for self-shadows
+  renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   // Create scene
@@ -85,6 +87,11 @@ export async function captureFrameSequence({
     modelClone.traverse((child) => {
       if (child instanceof THREE.Object3D) {
         child.layers.set(0);
+        // Enable casting shadows for all meshes
+        if (child instanceof THREE.Mesh && !modelSettings.wireframe) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
       }
     });
 
@@ -111,14 +118,15 @@ export async function captureFrameSequence({
         1
       );
       spotLight.position.set(5, 5, 5);
-      spotLight.castShadow = exportSettings.shadows;
+      // Always cast shadows for self-shadowing
+      spotLight.castShadow = true;
       spotLight.shadow.mapSize.width = 2048;
       spotLight.shadow.mapSize.height = 2048;
       spotLight.layers.enable(0);
       scene.add(spotLight);
     }
 
-    // Add shadow plane if shadows are enabled
+    // Add shadow plane if shadows are enabled in export settings
     if (exportSettings.shadows && !modelSettings.wireframe) {
       const shadowPlane = new THREE.Mesh(
         new THREE.PlaneGeometry(10, 10),
