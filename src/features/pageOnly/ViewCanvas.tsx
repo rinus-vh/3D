@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -30,7 +30,43 @@ export const ViewCanvas: React.FC<ViewCanvasProps> = ({
   showExportPanel,
   exportSettings,
 }) => {
-  const { cameraRef, controlsRef, handleZoomChange, handleOrbitChange } = useCamera();
+  const { cameraRef, controlsRef, handleZoomChange, handleOrbitChange, orbitX, orbitY } = useCamera();
+  const isUpdatingFromKnobs = useRef(false);
+
+  // Update camera when knob values change
+  useEffect(() => {
+    if (!controlsRef.current || isUpdatingFromKnobs.current) return;
+
+    isUpdatingFromKnobs.current = true;
+    
+    const camera = controlsRef.current.object;
+    const radius = camera.position.length();
+    
+    // Convert degrees to radians
+    const theta = THREE.MathUtils.degToRad(orbitX);
+    const phi = THREE.MathUtils.degToRad(90 - orbitY);
+    
+    // Calculate new camera position
+    camera.position.setFromSpherical(new THREE.Spherical(radius, phi, theta));
+    controlsRef.current.update();
+    
+    isUpdatingFromKnobs.current = false;
+  }, [orbitX, orbitY, controlsRef]);
+
+  // Update camera when zoom changes
+  useEffect(() => {
+    if (!controlsRef.current || isUpdatingFromKnobs.current) return;
+
+    isUpdatingFromKnobs.current = true;
+    
+    const camera = controlsRef.current.object;
+    const direction = camera.position.clone().normalize();
+    // Invert the zoom value for the camera position
+    camera.position.copy(direction.multiplyScalar(11 - zoom));
+    controlsRef.current.update();
+    
+    isUpdatingFromKnobs.current = false;
+  }, [zoom, controlsRef]);
 
   return (
     <div
@@ -39,7 +75,7 @@ export const ViewCanvas: React.FC<ViewCanvasProps> = ({
       style={{ gridArea: 'canvas' }}
     >
       <Canvas
-        camera={{ position: [0, 0, zoom], fov: 50 }}
+        camera={{ position: [0, 0, 11 - zoom], fov: 50 }}
         gl={{ preserveDrawingBuffer: true, alpha: true }}
         shadows={modelSettings.shadows && !modelSettings.wireframe}
         style={{ width: '100%', height: '100%' }}
@@ -76,16 +112,17 @@ export const ViewCanvas: React.FC<ViewCanvasProps> = ({
           makeDefault
           enableDamping={false}
           onChange={() => {
-            if (controlsRef.current) {
+            if (controlsRef.current && !isUpdatingFromKnobs.current) {
               const camera = controlsRef.current.object;
-              const newZoom = camera.position.length();
-              handleZoomChange(newZoom);
-
-              const spherical = new THREE.Spherical().setFromVector3(camera.position);
-              const orbitX = THREE.MathUtils.radToDeg(spherical.theta);
-              const orbitY = 90 - THREE.MathUtils.radToDeg(spherical.phi);
+              // Invert the zoom value when updating from camera position
+              const newZoom = 11 - camera.position.length();
               
-              handleOrbitChange(orbitX, orbitY);
+              const spherical = new THREE.Spherical().setFromVector3(camera.position);
+              const newOrbitX = THREE.MathUtils.radToDeg(spherical.theta);
+              const newOrbitY = 90 - THREE.MathUtils.radToDeg(spherical.phi);
+              
+              handleZoomChange(newZoom);
+              handleOrbitChange(newOrbitX, newOrbitY);
             }
           }}
         />

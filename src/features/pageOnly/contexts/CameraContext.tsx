@@ -16,7 +16,7 @@ interface CameraContextType {
 }
 
 const DEFAULT_ZOOM = 5;
-const DEFAULT_ORBIT = { x: 0, y: 0 };
+const DEFAULT_ORBIT = { x: 0, y: 15 };
 
 const CameraContext = createContext<CameraContextType | undefined>(undefined);
 

@@ -230,8 +230,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                   <Knob
                     value={zoom}
                     onChange={handleZoomChange}
-                    min={0.1}
-                    max={100}
+                    min={1}
+                    max={10}
                     step={0.1}
                     label="Zoom"
                     loop={false}
