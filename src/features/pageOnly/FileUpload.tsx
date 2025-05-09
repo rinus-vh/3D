@@ -87,51 +87,53 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   }, []);
 
   return (
-    <div
-      className={`w-full h-96 border ${isDragging
-          ? 'border-white bg-white/10'
-          : 'border-white/20 hover:border-white/40'
-        } transition-colors duration-300 flex flex-col items-center justify-center p-8`}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-    >
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileInputChange}
-        className="hidden"
-        accept=".fbx,.zip"
-      />
+    <div className='w-full h-full flex flex-col justify-center items-center'>
+      <div
+        className={`w-[600px] h-96 border-2 border-dashed rounded-lg transition-colors duration-300 flex flex-col items-center justify-center p-8 text-center
+        ${isDragging
+            ? 'border-white bg-white/10'
+            : 'border-white/20 hover:border-white/40'
+          }`}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileInputChange}
+          className="hidden"
+          accept=".fbx,.zip"
+        />
 
-      {isLoading ? (
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-t-white border-r-white border-b-transparent border-l-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-lg text-white/80">Processing your file...</p>
-        </div>
-      ) : (
-        <>
-          <FileType size={64} className="text-white/60 mb-6" />
-          <h2 className="text-xl font-medium mb-2">Upload 3D Model</h2>
-          <p className="text-white/60 mb-6 text-center max-w-md">
-            Drag and drop your .fbx or .zip file here, or click to select
-          </p>
+        {isLoading ? (
+          <div className="flex flex-col items-center">
+            <div className="w-12 h-12 border-4 border-t-white border-r-white border-b-transparent border-l-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-lg text-white/80">Processing your file...</p>
+          </div>
+        ) : (
+          <>
+            <h2 className="text-xl font-medium mb-2">Upload 3D Model</h2>
 
-          <ButtonWhite
-            onClick={handleButtonClick}
-            icon={Upload}
-          >
-            Select File
-          </ButtonWhite>
+            <p className="text-white/60 mb-6 text-center max-w-md">
+              Drag and drop your .fbx or .zip file here, or click to select
+            </p>
 
-          {error && (
-            <div className="mt-4 p-3 bg-red-500/10 border border-red-500/50 text-red-400">
-              {error}
-            </div>
-          )}
-        </>
-      )}
+            <ButtonWhite
+              label='Select File'
+              icon={Upload}
+              onClick={handleButtonClick}
+            />
+
+            {error && (
+              <div className="mt-4 p-3 bg-red-500/10 border border-red-500/50 text-red-400">
+                {error}
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

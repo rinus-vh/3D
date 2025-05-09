@@ -6,7 +6,8 @@ import { ModelSettingsProvider } from './features/pageOnly/contexts/ModelSetting
 import { RotationProvider } from './features/pageOnly/contexts/RotationContext';
 import { CameraProvider } from './features/pageOnly/contexts/CameraContext';
 import { ExportProvider } from './features/pageOnly/contexts/ExportContext';
-import { ControlPanelProvider } from './features/pageOnly/contexts/ControlPanelContext';
+import { ControlPanelPositionProvider } from './features/pageOnly/contexts/ControlPanelContext';
+import { EditHistoryProvider } from './features/pageOnly/contexts/EditHistoryContext';
 
 function App() {
   const [modelUrl, setModelUrl] = useState<string | null>(null);
@@ -52,34 +53,36 @@ function App() {
       <RotationProvider>
         <CameraProvider>
           <ExportProvider>
-            <ControlPanelProvider>
-              <AppContainer
-                showControls={!!modelUrl}
-                onToggleFullscreen={toggleFullscreen}
-                onDiscard={handleDiscardClick}
-                isFullscreen={isFullscreen}
-              >
-                {!modelUrl ? (
-                  <div className="w-full p-4">
-                    <FileUpload
-                      onModelLoaded={handleModelLoaded}
-                      onLoading={setIsLoading}
-                      onError={handleError}
-                      {...{ isLoading, error }}
+            <ControlPanelPositionProvider>
+              <EditHistoryProvider>
+                <AppContainer
+                  showControls={!!modelUrl}
+                  onToggleFullscreen={toggleFullscreen}
+                  onDiscard={handleDiscardClick}
+                  isFullscreen={isFullscreen}
+                >
+                  {!modelUrl ? (
+                    <div className="w-full p-4">
+                      <FileUpload
+                        onModelLoaded={handleModelLoaded}
+                        onLoading={setIsLoading}
+                        onError={handleError}
+                        {...{ isLoading, error }}
+                      />
+                    </div>
+                  ) : (
+                    <ModelViewer
+                      onCloseDiscardModal={() => setShowDiscardModal(false)}
+                      onConfirmDiscard={resetState}
+                      {...{
+                        modelUrl,
+                        showDiscardModal,
+                      }}
                     />
-                  </div>
-                ) : (
-                  <ModelViewer
-                    onCloseDiscardModal={() => setShowDiscardModal(false)}
-                    onConfirmDiscard={resetState}
-                    {...{
-                      modelUrl,
-                      showDiscardModal,
-                    }}
-                  />
-                )}
-              </AppContainer>
-            </ControlPanelProvider>
+                  )}
+                </AppContainer>
+              </EditHistoryProvider>
+            </ControlPanelPositionProvider>
           </ExportProvider>
         </CameraProvider>
       </RotationProvider>
@@ -87,4 +90,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

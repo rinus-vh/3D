@@ -4,6 +4,9 @@ import { PanelBase } from '../../buildingBlocks/PanelBase';
 import { Slider } from '../../buildingBlocks/Slider';
 import { ToggleWithLabel } from '../../buildingBlocks/ToggleWithLabel';
 import { usePanelManager } from '../contexts/PanelManagerContext';
+import { useEditHistory } from '../contexts/EditHistoryContext';
+import { useRotation } from '../contexts/RotationContext';
+import { useCamera } from '../contexts/CameraContext';
 
 interface LightingPanelProps {
   modelSettings: ModelSettings;
@@ -16,13 +19,27 @@ export const LightingPanel: React.FC<LightingPanelProps> = ({
 }) => {
   const { panelStates, closePanel } = usePanelManager();
   const { isOpen, zIndex } = panelStates.lighting;
+  const { rotation } = useRotation();
+  const { zoom, orbitX, orbitY } = useCamera();
+  const { addToHistory } = useEditHistory();
 
   if (!isOpen) return null;
 
   const handleSettingChange = (key: keyof ModelSettings, value: any) => {
-    onModelSettingsChange({
+    const newSettings = {
       ...modelSettings,
       [key]: value
+    };
+    
+    onModelSettingsChange(newSettings);
+    
+    // Add to history
+    addToHistory({
+      modelSettings: newSettings,
+      rotation,
+      zoom,
+      orbitX,
+      orbitY
     });
   };
 

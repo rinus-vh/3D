@@ -15,7 +15,6 @@ interface ViewCanvasProps {
   modelSettings: ModelSettings;
   zoom: number;
   showPlane: boolean;
-  showExportPanel: boolean;
   exportSettings: { shadows: boolean };
 }
 
@@ -27,7 +26,6 @@ export const ViewCanvas: React.FC<ViewCanvasProps> = ({
   modelSettings,
   zoom,
   showPlane,
-  showExportPanel,
   exportSettings,
 }) => {
   const { cameraRef, controlsRef, handleZoomChange, handleOrbitChange, orbitX, orbitY } = useCamera();
@@ -38,18 +36,18 @@ export const ViewCanvas: React.FC<ViewCanvasProps> = ({
     if (!controlsRef.current || isUpdatingFromKnobs.current) return;
 
     isUpdatingFromKnobs.current = true;
-    
+
     const camera = controlsRef.current.object;
     const radius = camera.position.length();
-    
+
     // Convert degrees to radians
     const theta = THREE.MathUtils.degToRad(orbitX);
     const phi = THREE.MathUtils.degToRad(90 - orbitY);
-    
+
     // Calculate new camera position
     camera.position.setFromSpherical(new THREE.Spherical(radius, phi, theta));
     controlsRef.current.update();
-    
+
     isUpdatingFromKnobs.current = false;
   }, [orbitX, orbitY, controlsRef]);
 
@@ -58,13 +56,13 @@ export const ViewCanvas: React.FC<ViewCanvasProps> = ({
     if (!controlsRef.current || isUpdatingFromKnobs.current) return;
 
     isUpdatingFromKnobs.current = true;
-    
+
     const camera = controlsRef.current.object;
     const direction = camera.position.clone().normalize();
     // Invert the zoom value for the camera position
     camera.position.copy(direction.multiplyScalar(11 - zoom));
     controlsRef.current.update();
-    
+
     isUpdatingFromKnobs.current = false;
   }, [zoom, controlsRef]);
 
@@ -102,7 +100,7 @@ export const ViewCanvas: React.FC<ViewCanvasProps> = ({
           <Model
             ref={modelRef}
             url={modelUrl}
-            showShadowPlane={!showExportPanel || exportSettings.shadows}
+            showShadowPlane={exportSettings.shadows}
             {...{ rotation, modelSettings, showPlane }}
           />
         </Suspense>
@@ -116,11 +114,11 @@ export const ViewCanvas: React.FC<ViewCanvasProps> = ({
               const camera = controlsRef.current.object;
               // Invert the zoom value when updating from camera position
               const newZoom = 11 - camera.position.length();
-              
+
               const spherical = new THREE.Spherical().setFromVector3(camera.position);
               const newOrbitX = THREE.MathUtils.radToDeg(spherical.theta);
               const newOrbitY = 90 - THREE.MathUtils.radToDeg(spherical.phi);
-              
+
               handleZoomChange(newZoom);
               handleOrbitChange(newOrbitX, newOrbitY);
             }

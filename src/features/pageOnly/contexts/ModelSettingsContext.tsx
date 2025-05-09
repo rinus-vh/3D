@@ -13,6 +13,13 @@ const DEFAULT_MODEL_SETTINGS: ModelSettings = {
   lightColor: '#ffffff',
   lightStrength: 2,
   gravity: false,
+  texture: {
+    enabled: false,
+    url: '',
+    scale: 1,
+    repeat: { x: 1, y: 1 },
+    offset: { x: 0, y: 0 }
+  }
 };
 
 interface ModelSettingsContextType {

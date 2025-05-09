@@ -86,28 +86,23 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
 
         <div className="flex flex-col gap-2 pt-4 border-t border-white/20">
           <ButtonWhite
-            onClick={startExport}
-            disabled={isRecording}
             fullWidth
+            label={isRecording ? 'Capturing frames' : 'Export frame sequence'}
             icon={isRecording ? Loader : Download}
-          >
-            {isRecording ? "Capturing frames" : "Export frame sequence"}
-          </ButtonWhite>
+            disabled={isRecording}
+            onClick={startExport}
+          />
         </div>
       </PanelBase>
 
       {showErrorModal && (
         <Modal
-          title="Error"
-          buttons={{
-            primary: {
-              label: "Close",
-              onClick: () => setShowErrorModal(false)
-            }
-          }}
-        >
-          {errorMessage}
-        </Modal>
+          title='Error'
+          message={errorMessage}
+          renderPrimaryButton={() => (
+            <ButtonWhite label='Close' onClick={() => setShowErrorModal(false)} />
+          )}
+        />
       )}
     </>
   );

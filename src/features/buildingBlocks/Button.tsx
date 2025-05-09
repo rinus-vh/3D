@@ -9,6 +9,7 @@ const buttonVariants = cva(
       variant: {
         white: 'bg-white text-black hover:bg-white/90',
         grey: 'bg-white/10 hover:bg-white/20',
+        red: 'bg-red-500 text-black hover:bg-red-600',
         outline: 'border border-white/20 hover:bg-white/10',
       },
       size: {
@@ -32,15 +33,16 @@ interface ButtonBaseProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
   VariantProps<typeof buttonVariants> {
   icon?: typeof LucideIcon;
+  label: string,
 }
 
 const ButtonBase: React.FC<ButtonBaseProps> = ({
+  label,
   className,
   variant,
   size,
   fullWidth,
-  icon: Icon,
-  children,
+  icon: Icon = undefined,
   ...props
 }) => {
   return (
@@ -49,7 +51,7 @@ const ButtonBase: React.FC<ButtonBaseProps> = ({
       {...props}
     >
       {Icon && <Icon size={size === 'icon' ? 16 : 20} />}
-      {children}
+      <span>{label}</span>
     </button>
   );
 };
@@ -60,6 +62,10 @@ export const ButtonWhite: React.FC<ButtonBaseProps> = (props) => (
 
 export const ButtonGrey: React.FC<ButtonBaseProps> = (props) => (
   <ButtonBase variant="grey" {...props} />
+);
+
+export const ButtonRed: React.FC<ButtonBaseProps> = (props) => (
+  <ButtonBase variant="red" {...props} />
 );
 
 export const ButtonOutline: React.FC<ButtonBaseProps> = (props) => (

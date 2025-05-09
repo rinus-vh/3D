@@ -21,7 +21,7 @@ interface ControlPanelContextType extends ControlPanelState {
 
 const ControlPanelContext = createContext<ControlPanelContextType | undefined>(undefined);
 
-export function ControlPanelProvider({ children }: { children: React.ReactNode }) {
+export function ControlPanelPositionProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<ControlPanelState>({
     isVisible: true,
     isCollapsed: false,
@@ -96,10 +96,10 @@ export function ControlPanelProvider({ children }: { children: React.ReactNode }
   );
 }
 
-export function useControlPanel() {
+export function useControlPanelPosition() {
   const context = useContext(ControlPanelContext);
   if (context === undefined) {
-    throw new Error('useControlPanel must be used within a ControlPanelProvider');
+    throw new Error('useControlPanelPosition must be used within a ControlPanelPositionProvider');
   }
   return context;
 }

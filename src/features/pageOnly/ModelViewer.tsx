@@ -5,7 +5,7 @@ import { useModelSettings } from './contexts/ModelSettingsContext';
 import { useRotation } from './contexts/RotationContext';
 import { useCamera } from './contexts/CameraContext';
 import { useExport } from './contexts/ExportContext';
-import { useControlPanel } from './contexts/ControlPanelContext';
+import { useControlPanelPosition } from './contexts/ControlPanelContext';
 
 import { ViewCanvas } from './ViewCanvas';
 import { Modal } from '../buildingBlocks/Modal';
@@ -16,6 +16,7 @@ import { MaterialPanel } from './panels/MaterialPanel';
 import { ExportPanel } from './panels/ExportPanel';
 import { AdvancedSettingsPanel } from './panels/AdvancedSettingsPanel';
 import { CapturePanel } from './panels/CapturePanel';
+import { ButtonRed, ButtonGrey } from '../buildingBlocks/Button';
 
 const PANEL_WIDTH = 320;
 
@@ -32,23 +33,17 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
   onCloseDiscardModal,
   onConfirmDiscard,
 }) => {
-  const { modelSettings, handleModelSettingsChange, resetModelSettings } = useModelSettings();
-  const { rotation, masterSpeed, setMasterSpeed, setRotation, resetRotation } = useRotation();
-  const { zoom, handleZoomChange, resetCamera } = useCamera();
+  const { modelSettings, handleModelSettingsChange } = useModelSettings();
+  const { rotation } = useRotation();
+  const { zoom } = useCamera();
   const { exportSettings, isRecording, exportProgress, currentFrame } = useExport();
-  const { isVisible: controlPanelIsVisible, dockPosition, dockPreview } = useControlPanel();
+  const { isVisible: controlPanelIsVisible, dockPosition, dockPreview } = useControlPanelPosition();
 
   const [showPlane, setShowPlane] = useState(false);
 
   const mainPanelRef = useRef<HTMLDivElement>(null);
   const modelRef = useRef<THREE.Group>(null);
   const viewPanelRef = useRef<HTMLDivElement>(null);
-
-  const handleReset = () => {
-    resetRotation();
-    resetCamera();
-    resetModelSettings();
-  };
 
   return (
     <div className="w-full h-[calc(100vh-4rem)] relative">
@@ -69,23 +64,7 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
               gridTemplateColumns: controlPanelIsVisible && dockPosition ? `${dockPosition === 'left' ? `${PANEL_WIDTH}px 1fr` : `1fr ${PANEL_WIDTH}px`}` : '1fr',
             }}
           >
-            {controlPanelIsVisible && dockPosition && (
-              <div
-                className="h-full border border-white/20 overflow-hidden"
-                style={{ gridArea: 'controls' }}
-              >
-                <div className="h-full overflow-y-auto">
-                  <ControlPanel
-                    onRotationChange={setRotation}
-                    onModelSettingsChange={handleModelSettingsChange}
-                    onMasterSpeedChange={setMasterSpeed}
-                    onZoomChange={handleZoomChange}
-                    onReset={handleReset}
-                    {...{ rotation, modelSettings, masterSpeed, zoom }}
-                  />
-                </div>
-              </div>
-            )}
+            {controlPanelIsVisible && <ControlPanel containerWidth={mainPanelRef.current?.clientWidth || 0} />}
 
             <ViewCanvas
               {...{
@@ -101,19 +80,7 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
             />
           </div>
 
-          {controlPanelIsVisible && !dockPosition && (
-            <ControlPanel
-              onRotationChange={setRotation}
-              onModelSettingsChange={handleModelSettingsChange}
-              onMasterSpeedChange={setMasterSpeed}
-              onZoomChange={handleZoomChange}
-              onReset={handleReset}
-              containerWidth={mainPanelRef.current?.clientWidth || 0}
-              {...{ rotation, modelSettings, masterSpeed, zoom }}
-            />
-          )}
-
-          <MaterialPanel
+          <WireframePanel
             onModelSettingsChange={handleModelSettingsChange}
             {...{ modelSettings }}
           />
@@ -123,7 +90,7 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
             {...{ modelSettings }}
           />
 
-          <WireframePanel
+          <MaterialPanel
             onModelSettingsChange={handleModelSettingsChange}
             {...{ modelSettings }}
           />
@@ -138,29 +105,16 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
           />
 
           {isRecording && (
-            <CapturePanel
-              progress={exportProgress}
-              {...{ currentFrame }}
-            />
+            <CapturePanel progress={exportProgress} {...{ currentFrame }} />
           )}
 
           {showDiscardModal && (
             <Modal
-              title="Discard 3D Model?"
-              buttons={{
-                secondary: {
-                  label: "Cancel",
-                  onClick: onCloseDiscardModal
-                },
-                primary: {
-                  label: "Discard",
-                  onClick: onConfirmDiscard,
-                  className: "bg-red-500 hover:bg-red-600"
-                }
-              }}
-            >
-              Are you sure you want to discard this 3D model? This action cannot be undone.
-            </Modal>
+              title='Discard 3D Model?'
+              message='Are you sure you want to discard this 3D model? This action cannot be undone.'
+              renderSecondaryButton={() => <ButtonGrey label='Cancel' onClick={onCloseDiscardModal} />}
+              renderPrimaryButton={() => <ButtonRed label='Discard' onClick={onConfirmDiscard} />}
+            />
           )}
         </div>
       </div>

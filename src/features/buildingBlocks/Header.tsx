@@ -2,7 +2,7 @@ import React from 'react';
 import { Maximize, Minimize, Settings, Download, Trash2 } from 'lucide-react';
 import { ToggleButton } from './ToggleButton';
 import { usePanelManager } from '../pageOnly/contexts/PanelManagerContext';
-import { useControlPanel } from '../pageOnly/contexts/ControlPanelContext';
+import { useControlPanelPosition } from '../pageOnly/contexts/ControlPanelContext';
 
 interface HeaderProps {
   isFullscreen?: boolean;
@@ -18,7 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
   onDiscard
 }) => {
   const { panelStates, togglePanel } = usePanelManager();
-  const { isVisible, toggleVisibility } = useControlPanel();
+  const { isVisible, toggleVisibility } = useControlPanelPosition();
 
   return (
     <header className="bg-black p-4 border-b border-white/20">
