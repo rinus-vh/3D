@@ -27,41 +27,41 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   return (
     <Container {...{ containerWidth }}>
       <div className="bg-black flex flex-col">
-        <div className="panel-handle flex items-center justify-between p-3 bg-white/5 cursor-move">
-          <div className="flex items-center gap-2">
-            <Settings size={20} />
-            <span className="font-medium">Controls</span>
+        <div className="sticky top-0 panel-handle bg-[#0d0d0d] border-b border-white/20 cursor-move z-[10]">
+          <div className="sticky top-0 panel-handle flex items-center justify-between p-3 bg-[#0d0d0d] cursor-move">
+            <div className="flex items-center gap-2">
+              <Settings size={20} />
+              <span className="font-medium">Controls</span>
+            </div>
+
+            <ButtonSimpleIcon
+              icon={isCollapsed ? ChevronRight : ChevronDown}
+              onClick={toggleCollapse}
+              title={isCollapsed ? "Expand panel" : "Collapse panel"}
+            />
           </div>
 
-          <ButtonSimpleIcon
-            icon={isCollapsed ? ChevronRight : ChevronDown}
-            onClick={toggleCollapse}
-            title={isCollapsed ? "Expand panel" : "Collapse panel"}
-          />
+          {!isCollapsed && <EditHistoryBar />}
         </div>
 
         {!isCollapsed && (
-          <>
-            <EditHistoryBar />
+          <div className="overflow-y-auto flex-1">
+            <div className="p-4 space-y-6">
+              <AnimationSpeed />
+              <ModelRotation />
+              <ModelSettings />
+              <CameraSettings />
 
-            <div className="overflow-y-auto flex-1">
-              <div className="p-4 space-y-6">
-                <AnimationSpeed />
-                <ModelRotation />
-                <ModelSettings />
-                <CameraSettings />
-
-                <div className="pt-4 border-t border-white/20">
-                  <ButtonGrey
-                    fullWidth
-                    label='Advanced Settings'
-                    icon={Settings}
-                    onClick={() => openPanel('advanced')}
-                  />
-                </div>
+              <div className="pt-4 border-t border-white/20">
+                <ButtonGrey
+                  fullWidth
+                  label='Advanced Settings'
+                  icon={Settings}
+                  onClick={() => openPanel('advanced')}
+                />
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
     </Container>

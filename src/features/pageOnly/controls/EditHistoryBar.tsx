@@ -7,7 +7,7 @@ export const EditHistoryBar: React.FC = () => {
   const { canUndo, canRedo, undo, redo, resetAll, saveProject, uploadProject } = useEditHistory();
 
   return (
-    <div className="border-b border-white/20 p-3 bg-white/5">
+    <div className="border-b border-white/20 p-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ButtonSimpleIcon

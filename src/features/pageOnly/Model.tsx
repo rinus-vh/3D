@@ -251,7 +251,7 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
     for (let j = 0; j < textureSize; j++) {
       const index = (i * textureSize + j) * 4;
       const isEven = (i + j) % 2 === 0;
-      const color = isEven ? 100 : 95;
+      const color = isEven ? 200 : 190;
       data[index] = color;
       data[index + 1] = color;
       data[index + 2] = color;

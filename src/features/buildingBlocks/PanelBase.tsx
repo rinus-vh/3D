@@ -48,7 +48,7 @@ export const PanelBase: React.FC<PanelBaseProps> = ({
         className="absolute top-20 right-20 w-[280px] bg-black border border-white/20 rounded-lg overflow-auto shadow-lg"
         style={{ zIndex, maxHeight: '90%' }}
       >
-        <div className="sticky top-0 panel-handle bg-[#0d0d0d] bg-white/5 border-b border-white/20 cursor-move">
+        <div className="sticky top-0 panel-handle bg-[#0d0d0d] border-b border-white/20 cursor-move z-[10]">
           <div className="flex items-center justify-between p-3">
             <span className="font-medium">{title}</span>
             <div className="flex items-center gap-2">
