@@ -9,8 +9,22 @@ export interface RotationSettings {
   z: AxisRotation;
 }
 
+export interface TextureSettings {
+  enabled: boolean;
+  url: string;
+  scale: number;
+  repeat: { x: number; y: number };
+  offset: { x: number; y: number };
+}
+
+export interface BumpMapSettings {
+  enabled: boolean;
+  url: string;
+  strength: number;
+}
+
 export interface ModelSettings {
-  panelTabs: 'general' | 'texture';
+  panelTabs: 'general' | 'texture' | 'bumpMap';
   wireframe: boolean;
   wireframeColor: string;
   color: string;
@@ -22,13 +36,14 @@ export interface ModelSettings {
   lightColor: string;
   lightStrength: number;
   gravity: boolean;
-  texture: {
-    enabled: boolean;
-    url: string;
-    scale: number;
-    repeat: { x: number; y: number };
-    offset: { x: number; y: number };
-  };
+  texture: TextureSettings;
+  bumpMap: BumpMapSettings;
+}
+
+export interface AdvancedSettings {
+  backgroundColor: string;
+  showGroundPlane: boolean;
+  gravity: boolean;
 }
 
 export interface ExportSettings {

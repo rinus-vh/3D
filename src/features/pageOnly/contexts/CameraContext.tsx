@@ -8,7 +8,7 @@ interface CameraContextType {
   orbitY: number;
   setOrbitX: (value: number) => void;
   setOrbitY: (value: number) => void;
-  cameraRef: React.RefObject<THREE.Camera>;
+  cameraRef: React.MutableRefObject<THREE.Camera | null>;
   controlsRef: React.RefObject<any>;
   handleZoomChange: (newZoom: number) => void;
   handleOrbitChange: (x: number, y: number) => void;
@@ -24,7 +24,7 @@ export function CameraProvider({ children }: { children: React.ReactNode }) {
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const [orbitX, setOrbitX] = useState(DEFAULT_ORBIT.x);
   const [orbitY, setOrbitY] = useState(DEFAULT_ORBIT.y);
-  const cameraRef = useRef<THREE.Camera>();
+  const cameraRef = useRef<THREE.Camera | null>(null);
   const controlsRef = useRef<any>();
 
   const handleZoomChange = useCallback((newZoom: number) => {

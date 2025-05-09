@@ -1,30 +1,16 @@
 import React from 'react';
 import { PanelBase } from '../../buildingBlocks/PanelBase';
 import { LabelWithSettings } from '../../buildingBlocks/LabelWithSettings';
+import { InputColor } from '../../buildingBlocks/InputColor';
 import { usePanelManager } from '../contexts/PanelManagerContext';
-import { useModelSettings } from '../contexts/ModelSettingsContext';
+import { useAdvancedSettings } from '../contexts/AdvancedSettingsContext';
 
-interface AdvancedSettingsProps {
-  showPlane: boolean;
-  onShowPlaneChange: (value: boolean) => void;
-}
-
-export const AdvancedSettingsPanel: React.FC<AdvancedSettingsProps> = ({
-  showPlane,
-  onShowPlaneChange,
-}) => {
+export const AdvancedSettingsPanel: React.FC = () => {
   const { panelStates, closePanel } = usePanelManager();
   const { isOpen, zIndex } = panelStates.advanced;
-  const { modelSettings, handleModelSettingsChange } = useModelSettings();
+  const { advancedSettings, updateAdvancedSettings } = useAdvancedSettings();
 
   if (!isOpen) return null;
-
-  const handleGravityChange = (value: boolean) => {
-    handleModelSettingsChange({
-      ...modelSettings,
-      gravity: value
-    });
-  };
 
   return (
     <PanelBase
@@ -34,16 +20,21 @@ export const AdvancedSettingsPanel: React.FC<AdvancedSettingsProps> = ({
       onClose={() => closePanel("advanced")}
     >
       <div className="space-y-4">
+        <InputColor
+          label="Background Color"
+          value={advancedSettings.backgroundColor}
+          onChange={(value) => updateAdvancedSettings('backgroundColor', value)}
+        />
         <LabelWithSettings
           label="Show Ground Plane"
-          value={showPlane}
-          onChange={onShowPlaneChange}
+          value={advancedSettings.showGroundPlane}
+          onChange={(value) => updateAdvancedSettings('showGroundPlane', value)}
           showToggle={true}
         />
         <LabelWithSettings
           label="Gravity"
-          value={modelSettings.gravity}
-          onChange={handleGravityChange}
+          value={advancedSettings.gravity}
+          onChange={(value) => updateAdvancedSettings('gravity', value)}
           showToggle={true}
         />
       </div>

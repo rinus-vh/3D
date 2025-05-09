@@ -1,6 +1,7 @@
 import React from 'react';
 import { ModelSettings } from '../../../types';
 import { PanelBase } from '../../buildingBlocks/PanelBase';
+import { InputColor } from '../../buildingBlocks/InputColor';
 import { usePanelManager } from '../contexts/PanelManagerContext';
 import { useEditHistory } from '../contexts/EditHistoryContext';
 import { useRotation } from '../contexts/RotationContext';
@@ -49,15 +50,11 @@ export const WireframePanel: React.FC<WireframePanelProps> = ({
       onClose={() => closePanel("wireframe")}
     >
       <div className="space-y-4">
-        <div className="space-y-2">
-          <label className="block text-sm text-white/60">Wireframe Color</label>
-          <input
-            type="color"
-            value={modelSettings.wireframeColor}
-            onChange={(e) => handleSettingChange('wireframeColor', e.target.value)}
-            className="w-full h-8 bg-transparent cursor-pointer"
-          />
-        </div>
+        <InputColor
+          label="Wireframe Color"
+          value={modelSettings.wireframeColor}
+          onChange={(value) => handleSettingChange('wireframeColor', value)}
+        />
       </div>
     </PanelBase>
   );

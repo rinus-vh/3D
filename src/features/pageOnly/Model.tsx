@@ -1,8 +1,10 @@
-import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
+import { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 import { ModelSettings, RotationSettings } from '../../types';
+import { useAdvancedSettings } from './contexts/AdvancedSettingsContext';
 
 interface ModelProps {
   url: string;
@@ -10,7 +12,6 @@ interface ModelProps {
   modelSettings: ModelSettings;
   isRecording?: boolean;
   isPreview?: boolean;
-  showShadowPlane?: boolean;
   showPlane?: boolean;
 }
 
@@ -20,7 +21,6 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
   modelSettings,
   isRecording = false,
   isPreview = false,
-  showShadowPlane = true,
   showPlane = false
 }, ref) => {
   const groupRef = useRef<THREE.Group>(null);
@@ -32,6 +32,7 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
   const velocityRef = useRef(0);
   const [modelHeight, setModelHeight] = useState(0);
   const textureLoader = useRef(new THREE.TextureLoader());
+  const { advancedSettings } = useAdvancedSettings();
 
   useImperativeHandle(ref, () => groupRef.current!, []);
 
@@ -53,7 +54,7 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
           setModelHeight((size.y * scale) / 2);
 
           loadedModel.position.sub(center.multiplyScalar(scale));
-          
+
           loadedModel.layers.set(0);
           loadedModel.traverse((child) => {
             if (child instanceof THREE.Object3D) {
@@ -114,7 +115,7 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
               const edgesGeometry = new THREE.EdgesGeometry(originalGeometry);
               const edgeVertexCount = Math.floor(edgesGeometry.attributes.position.count * modelSettings.resolution);
               edgesGeometry.setDrawRange(0, edgeVertexCount);
-              
+
               const wireframeMaterial = new THREE.LineBasicMaterial({
                 color: modelSettings.wireframeColor,
                 linewidth: 1
@@ -124,10 +125,13 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
               child.add(newWireframe);
               child.material.visible = false;
             } else {
+              THREE.DefaultLoadingManager.addHandler(/\.dds$/i, new DDSLoader());
+
               const material = new THREE.MeshStandardMaterial({
                 color: modelSettings.color,
                 metalness: modelSettings.metalness,
-                roughness: modelSettings.roughness
+                roughness: modelSettings.roughness,
+                normalScale: new THREE.Vector2(1, 1)
               });
 
               if (modelSettings.texture.enabled && modelSettings.texture.url) {
@@ -143,6 +147,21 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
                   modelSettings.texture.offset.y
                 );
                 material.map = texture;
+              }
+
+              if (modelSettings.bumpMap.enabled && modelSettings.bumpMap.url) {
+                const bumpTexture = textureLoader.current.load(modelSettings.bumpMap.url);
+                bumpTexture.wrapS = THREE.RepeatWrapping;
+                bumpTexture.wrapT = THREE.RepeatWrapping;
+
+                // Convert bump map to normal map
+                const normalMap = new THREE.TextureLoader().load(modelSettings.bumpMap.url);
+                normalMap.wrapS = THREE.RepeatWrapping;
+                normalMap.wrapT = THREE.RepeatWrapping;
+
+                material.normalMap = normalMap;
+                material.normalScale.set(modelSettings.bumpMap.strength, modelSettings.bumpMap.strength);
+                material.needsUpdate = true;
               }
 
               child.material = material;
@@ -204,7 +223,7 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
           groupRef.current.rotation.z = rotation.z.fixed;
         }
 
-        if (modelSettings.gravity && !isRecording) {
+        if (advancedSettings.gravity && !isRecording) {
           const gravity = 9.81;
           const groundLevel = -1.5 + modelHeight;
           const currentY = groupRef.current.position.y;
@@ -247,7 +266,7 @@ export const Model = forwardRef<THREE.Group, ModelProps>(({
       <group ref={groupRef}>
         {model && <primitive object={model} />}
       </group>
-      
+
       {showPlane && (
         <mesh
           ref={planeRef}

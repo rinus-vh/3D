@@ -3,7 +3,8 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-import { ModelSettings, RotationSettings } from '../../types';
+import { ModelSettings, RotationSettings, AdvancedSettings, ExportSettings } from '../../types';
+
 import { Model } from './Model';
 import { useCamera } from './contexts/CameraContext';
 
@@ -14,8 +15,7 @@ interface ViewCanvasProps {
   rotation: RotationSettings;
   modelSettings: ModelSettings;
   zoom: number;
-  showPlane: boolean;
-  exportSettings: { shadows: boolean };
+  advancedSettings: AdvancedSettings;
 }
 
 export const ViewCanvas: React.FC<ViewCanvasProps> = ({
@@ -25,11 +25,18 @@ export const ViewCanvas: React.FC<ViewCanvasProps> = ({
   rotation,
   modelSettings,
   zoom,
-  showPlane,
-  exportSettings,
+  advancedSettings,
 }) => {
   const { cameraRef, controlsRef, handleZoomChange, handleOrbitChange, orbitX, orbitY } = useCamera();
   const isUpdatingFromKnobs = useRef(false);
+  const sceneRef = useRef<THREE.Scene>();
+
+  // Update scene background when advancedSettings change
+  useEffect(() => {
+    if (sceneRef.current) {
+      sceneRef.current.background = new THREE.Color(advancedSettings.backgroundColor);
+    }
+  }, [advancedSettings.backgroundColor]);
 
   // Update camera when knob values change
   useEffect(() => {
@@ -77,9 +84,11 @@ export const ViewCanvas: React.FC<ViewCanvasProps> = ({
         gl={{ preserveDrawingBuffer: true, alpha: true }}
         shadows={modelSettings.shadows && !modelSettings.wireframe}
         style={{ width: '100%', height: '100%' }}
-        onCreated={({ camera }) => {
+        onCreated={({ camera, scene }) => {
           cameraRef.current = camera;
           camera.layers.enableAll();
+          sceneRef.current = scene;
+          scene.background = new THREE.Color(advancedSettings.backgroundColor);
         }}
       >
         <ambientLight intensity={0.5} />
@@ -100,8 +109,8 @@ export const ViewCanvas: React.FC<ViewCanvasProps> = ({
           <Model
             ref={modelRef}
             url={modelUrl}
-            showShadowPlane={exportSettings.shadows}
-            {...{ rotation, modelSettings, showPlane }}
+            showPlane={advancedSettings.showGroundPlane}
+            {...{ rotation, modelSettings }}
           />
         </Suspense>
 

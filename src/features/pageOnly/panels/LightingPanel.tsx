@@ -2,6 +2,7 @@ import React from 'react';
 import { ModelSettings } from '../../../types';
 import { PanelBase } from '../../buildingBlocks/PanelBase';
 import { Slider } from '../../buildingBlocks/Slider';
+import { InputColor } from '../../buildingBlocks/InputColor';
 import { ToggleWithLabel } from '../../buildingBlocks/ToggleWithLabel';
 import { usePanelManager } from '../contexts/PanelManagerContext';
 import { useEditHistory } from '../contexts/EditHistoryContext';
@@ -57,16 +58,12 @@ export const LightingPanel: React.FC<LightingPanelProps> = ({
         disabled={!modelSettings.lighting || modelSettings.wireframe}
       />
 
-      <div>
-        <label className="block text-sm text-white/60 mb-2">Light Color</label>
-        <input
-          type="color"
-          value={modelSettings.lightColor}
-          onChange={(e) => handleSettingChange('lightColor', e.target.value)}
-          className="w-full h-8 bg-transparent cursor-pointer"
-          disabled={!modelSettings.lighting || modelSettings.wireframe}
-        />
-      </div>
+      <InputColor
+        label="Light Color"
+        value={modelSettings.lightColor}
+        onChange={(value) => handleSettingChange('lightColor', value)}
+        disabled={!modelSettings.lighting || modelSettings.wireframe}
+      />
 
       <Slider
         value={modelSettings.lightStrength}

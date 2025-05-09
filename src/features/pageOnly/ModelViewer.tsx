@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import * as THREE from 'three';
 
 import { useModelSettings } from './contexts/ModelSettingsContext';
@@ -6,6 +6,7 @@ import { useRotation } from './contexts/RotationContext';
 import { useCamera } from './contexts/CameraContext';
 import { useExport } from './contexts/ExportContext';
 import { useControlPanelPosition } from './contexts/ControlPanelContext';
+import { useAdvancedSettings } from './contexts/AdvancedSettingsContext';
 
 import { ViewCanvas } from './ViewCanvas';
 import { Modal } from '../buildingBlocks/Modal';
@@ -38,8 +39,7 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
   const { zoom } = useCamera();
   const { exportSettings, isRecording, exportProgress, currentFrame } = useExport();
   const { isVisible: controlPanelIsVisible, dockPosition, dockPreview } = useControlPanelPosition();
-
-  const [showPlane, setShowPlane] = useState(false);
+  const { advancedSettings } = useAdvancedSettings();
 
   const mainPanelRef = useRef<HTMLDivElement>(null);
   const modelRef = useRef<THREE.Group>(null);
@@ -74,8 +74,7 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
                 rotation,
                 modelSettings,
                 zoom,
-                showPlane,
-                exportSettings,
+                advancedSettings,
               }}
             />
           </div>
@@ -90,19 +89,13 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
             {...{ modelSettings }}
           />
 
-          <MaterialPanel
-            onModelSettingsChange={handleModelSettingsChange}
-            {...{ modelSettings }}
-          />
+          <MaterialPanel />
 
           <ExportPanel
             {...{ modelRef, rotation, modelSettings }}
           />
 
-          <AdvancedSettingsPanel
-            onShowPlaneChange={setShowPlane}
-            {...{ showPlane }}
-          />
+          <AdvancedSettingsPanel />
 
           {isRecording && (
             <CapturePanel progress={exportProgress} {...{ currentFrame }} />

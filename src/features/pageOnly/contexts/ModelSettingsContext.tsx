@@ -19,6 +19,11 @@ const DEFAULT_MODEL_SETTINGS: ModelSettings = {
     scale: 1,
     repeat: { x: 1, y: 1 },
     offset: { x: 0, y: 0 }
+  },
+  bumpMap: {
+    enabled: false,
+    url: '',
+    strength: 0.5
   }
 };
 
